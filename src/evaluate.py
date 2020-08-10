@@ -9,7 +9,7 @@
 
 from sklearn.metrics import confusion_matrix
 import numpy as np
-
+import pandas as pd
 class Eval_unit(object):
     def __init__(self,tp,fp,fn,tn,label):
         super(Eval_unit,self).__init__()
@@ -23,8 +23,8 @@ class Eval_unit(object):
     def __getattr__(self,name):
         return self[name] if name in self.__dict__ else self.d[name]
 
-    def show(self):
-        pass
+    def todict(self):
+        return {"acc":self.accuracy,"prec":self.precision,"recall":self.recall,"f1_score":self.f1_score}
 
     @classmethod
     def cal_accuracy(cls,tp:int,fp:int,fn:int,tn:int)->float:
@@ -134,7 +134,8 @@ def evaluate_multiclass(units:list,type:str):
         P=tp/(tp+fp)
         R=tp/(tp+fn)
     f1=2*P*R/(P+R)
-    return P,R,f1
+
+    return {"prec":P,"recall":R,"f1_score":f1}
 
 
 if __name__=='__main__':

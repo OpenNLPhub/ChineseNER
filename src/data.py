@@ -1,3 +1,10 @@
+'''
+ * @author Waileinsamkeit
+ * @email Zenglz_pro@163.com
+ * @create date 2020-08-07 15:52:18
+ * @modify date 2020-08-07 15:52:18
+'''
+
 import os
 from codecs import open
 

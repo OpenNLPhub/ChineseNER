@@ -1,3 +1,10 @@
+'''
+ * @author Waileinsamkeit
+ * @email Zenglz_pro@163.com
+ * @create date 2020-08-07 15:52:11
+ * @modify date 2020-08-07 15:52:11
+'''
+
 import torch
 import torch.autograd as autograd
 import torch.nn as nn
@@ -44,7 +51,7 @@ def flatten_lists(lists):
 def save_model(model,file_name):
     """Save the model"""
     with open(file_name,"wb") as f:
-        model=pickle.dump(model,f)
+        pickle.dump(model,f)
 
 
 def load_model(file_name):
