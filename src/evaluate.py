@@ -138,6 +138,15 @@ def evaluate_multiclass(units:list,type:str):
     return {"prec":P,"recall":R,"f1_score":f1}
 
 
+def unitstopd(units):
+    d={}
+    macro=evaluate_multiclass(units,"macro")
+    micro=evaluate_multiclass(units,"micro")
+    d={ (unit.id,unit.todict) for unit in units}
+    d["macro"]=macro
+    d["micro"]=micro
+    df=pd.DataFrame(d)
+    return df
 if __name__=='__main__':
     k=Eval_unit(1,2,3,4,'test')
     print(k.__dict__)

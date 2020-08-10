@@ -13,7 +13,7 @@ from utils import extend_map,add_label_for_lstmcrf,save_model,flatten_lists,load
 import time
 from datetime import datetime
 import os
-from evaluate import Eval_unit,evaluate_entity_label,evaluate_single_label,evaluate_multiclass
+from evaluate import Eval_unit,evaluate_entity_label,evaluate_single_label,evaluate_multiclass,unitstopd
 import pandas as pd
 
 cwd=os.getcwd()
@@ -81,16 +81,19 @@ def bilstm_crf_test(if_train=True):
     label_tag_lists=flatten_lists(pred_tag_lists)
 
     units=evaluate_entity_label(pred_tag_lists,label_tag_lists,list(tag2id.keys()))
-    macro=evaluate_multiclass(units,"macro")
-    micro=evaluate_multiclass(units,"micro")
-
-    d={ (unit.id,unit.todict) for unit in units}
-    d["macro"]=macro
-    d["micro"]=micro
-    df=pd.DataFrame(d)
-    result_file_name="result.csv"
-    result_path=os.path.join(cwd,'result_file_name')
+    df=unitstopd(units)
+    result_file_name="entity_result.csv"
+    result_path=os.path.join(cwd,result_file_name)
     df.to_csv(result_path)
+
+    units=evaluate_single_label(pred_tag_lists,label_tag_lists,list(tag2id.keys()))
+    df=unitstopd(units)
+    result_file_name="model_result.csv"
+    result_path=os.path.join(cwd,result_file_name)
+    df.to_csv(result_path)
+
+
+    
     
 if __name__=='__main__':
     bilstm_crf_test(if_train=True)
