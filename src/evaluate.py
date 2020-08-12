@@ -10,6 +10,7 @@
 from sklearn.metrics import confusion_matrix
 import numpy as np
 import pandas as pd
+from utils import flatten_lists
 class Eval_unit(object):
     def __init__(self,tp,fp,fn,tn,label):
         super(Eval_unit,self).__init__()
@@ -46,13 +47,15 @@ class Eval_unit(object):
 
 
 def evaluate_single_label(pred,label,classes):
+    pred=flatten_lists(pred)
+    label=flatten_lists(label)
     matrix=confusion_matrix(pred,label,classes)
     TP=np.diag(matrix)
     FP=matrix.sum(axis=1)-TP
     FN=matrix.sum(axis=0)-TP
     TN=matrix.sum()-TP-FN-FP
     unit_list=[]
-    for i in range(classes):
+    for i in range(len(classes)):
         cla=classes[i]
         unit=Eval_unit(TP[i],FP[i],FN[i],TN[i],cla)
         unit_list.append(unit)
@@ -71,6 +74,8 @@ I-PER
 O
 """
 def evaluate_entity_label(pred,label,classes):
+    pred=flatten_lists(pred)
+    label=flatten_lists(label)
     assert len(pred)==len(label)
     cla=[i.split('-')[-1] for i in classes if i!='O']
     cla=list(set(cla))
@@ -80,7 +85,7 @@ def evaluate_entity_label(pred,label,classes):
     pred_entities=np.zeros(len(cla),dtype=int) #TP+FP
     label_entities=np.zeros(len(cla),dtype=int) #TP+FN
     acc=np.zeros(len(cla),dtype=int) #TP
-    while index<len(pred):
+    while index<len(label):
         label_tag=label[index]
         if label_tag=='O':
             index+=1
@@ -89,7 +94,7 @@ def evaluate_entity_label(pred,label,classes):
             c=cla2ind[c]
             next_tag='I'+label_tag[1:]
             j=index+1
-            while label[j]==next_tag:
+            while label[j]==next_tag and j<len(label):
                 j+=1
             label_entities[c]+=1
             label_entity= ''.join(label[index:j])
@@ -97,20 +102,25 @@ def evaluate_entity_label(pred,label,classes):
             if label_entity==pred_entity:
                 acc[c]+=1
             index=j
+    #统计Pred_tag 上的Entity
     index=0
     while index<len(pred):
         pred_tag=pred[index]
-        if pred_tag=='0':
+        if pred_tag=='O':
             index+=1
         elif pred_tag.split('-')[0]=='B':
-            c=label_tag.split('-')[-1]
+            c=pred_tag.split('-')[-1]
             c=cla2ind[c]
-            next_tag='I'+label_tag[1:]
+            next_tag='I'+pred_tag[1:]
             j=index+1
-            while pred[j]==next_tag:
+            while pred[j]==next_tag and j<len(pred):
                 j+=1
             pred_entities[c]+=1
             index=j
+        else:
+            index+=1
+        # if index%100==0:
+        #     print(index,end=' ')
     units=[]
     TP=acc
     FP=pred_entities-acc
@@ -137,16 +147,20 @@ def evaluate_multiclass(units:list,type:str):
 
     return {"prec":P,"recall":R,"f1_score":f1}
 
-
+'''
+将Eval_unit 的list 转化成 pandas 中的 DataFrame
+'''
 def unitstopd(units):
     d={}
     macro=evaluate_multiclass(units,"macro")
     micro=evaluate_multiclass(units,"micro")
-    d={ (unit.id,unit.todict) for unit in units}
+    d=dict((unit.id,unit.todict()) for unit in units)
     d["macro"]=macro
     d["micro"]=micro
     df=pd.DataFrame(d)
     return df
+
+
 if __name__=='__main__':
     k=Eval_unit(1,2,3,4,'test')
     print(k.__dict__)
