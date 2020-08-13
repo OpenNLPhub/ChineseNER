@@ -33,17 +33,17 @@ class Eval_unit(object):
     
     @classmethod
     def cal_precision(cls,tp:int,fp:int,fn:int,tn:int)->float:
-        return float(tp)/(tp+fp)
+        return float(tp)/(tp+fp) if tp+fp!=0 else 0.
     
     @classmethod
     def cal_recall(cls,tp:int,fp:int,fn:int,tn:int)->float:
-        return float(tp)/(tp+fn)
+        return float(tp)/(tp+fn) if tp+fn!=0 else 0.
     
     @classmethod
     def cal_f1_score(cls,tp:int,fp:int,fn:int,tn:int)->float:
         p=cls.cal_precision(tp,fp,fn,tn)
         r=cls.cal_recall(tp,fp,fn,tn)
-        return 2*p*r/(r+p)
+        return 2*p*r/(r+p) if r+p !=0 else 0.
 
 
 def evaluate_single_label(pred,label,classes):

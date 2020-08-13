@@ -23,6 +23,10 @@ def build_corpus(prefix_file,data_dir=os.path.join(os.getcwd(),"data")):
                 word_list.append(word)
                 tag_list.append(tag)
             else:
+                #样本平衡
+                # if len(set(tag_list))!=1:
+                #     word_lists.append(word_list)
+                #     tag_lists.append(tag_list)
                 word_lists.append(word_list)
                 tag_lists.append(tag_list)
                 word_list=[]

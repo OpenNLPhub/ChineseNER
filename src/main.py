@@ -12,7 +12,9 @@ import pandas as pd
 import time
 import os
 from utils import extend_map,add_label_for_lstmcrf,save_model,flatten_lists,load_model
-from model import BiLSTM_CRF_Model,HMM,HMM_standard
+from models.hmm import HMM
+from models.standard import HMM_standard
+from models.bilstm_crf import BiLSTM_CRF_Model
 from data import build_corpus
 from datetime import datetime
 from evaluate import Eval_unit,evaluate_entity_label,evaluate_single_label,evaluate_multiclass,unitstopd
@@ -93,6 +95,8 @@ def HMM_test(if_train=True):
     print("upload data!")
     word_lists,tag_lists,word2id,tag2id=build_corpus("train")
     test_word_lists,test_tag_lists,_,_=build_corpus("test")
+    # word_lists,tag_lists,word2id,tag2id=build_corpus("train",data_dir=os.path.join(os.getcwd(),"data",'ResumeNER'))
+    # test_word_lists,test_tag_lists,_,_=build_corpus("test",data_dir=os.path.join(os.getcwd(),"data",'ResumeNER'))
 
     hmm_model=HMM(len(tag2id),len(word2id))
     
@@ -120,8 +124,8 @@ def HMM_test_standard(if_train=True):
     model_is_existed=os.path.exists(ModelPathConfig.hmm_standard)
 
     print("upload data!")
-    word_lists,tag_lists,word2id,tag2id=build_corpus("train")
-    test_word_lists,test_tag_lists,_,_=build_corpus("test")
+    word_lists,tag_lists,word2id,tag2id=build_corpus("train",data_dir=os.path.join(os.getcwd(),"data",'ResumeNER'))
+    test_word_lists,test_tag_lists,_,_=build_corpus("test",data_dir=os.path.join(os.getcwd(),"data",'ResumeNER'))
 
     hmm_model=HMM_standard(len(tag2id),len(word2id))
     
@@ -147,7 +151,8 @@ def HMM_test_standard(if_train=True):
     
 
 if __name__=='__main__':
-    HMM_test_standard(False)
+    HMM_test(True)
+    # HMM_test_standard(False)
     
 
 
