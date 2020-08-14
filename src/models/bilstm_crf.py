@@ -15,8 +15,8 @@ from utils import tensorized,sort_by_lengths,cal_loss,cal_lstm_crf_loss
 from models.bilstm import BiLSTM
 
 class BiLSTM_CRF(nn.Module):
-    """ 
-    Copy from PyTorch Tutorial 
+    """
+    Copy from PyTorch Tutorial
     """
     def __init__(self, vocab_size, emb_size, hidden_size, out_size):
         """初始化参数：
@@ -123,11 +123,11 @@ class BiLSTM_CRF(nn.Module):
 
 class BiLSTM_CRF_Model():
     def __init__(self,vocab_size,out_size,crf=True):
-        self.device=torch.device("cuda" if torch.cuda.is_availabel() else "cpu")
+        self.device=torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
-        self.embedding_size=0
+        self.embedding_size=LSTMConfig.embedding_size
         self.hidden_size=LSTMConfig.hidden_size
-        
+
         self.crf=crf
 
         #无条件随机场
@@ -137,7 +137,7 @@ class BiLSTM_CRF_Model():
         else:
             self.model=BiLSTM_CRF(vocab_size,self.embedding_size,self.hidden_size,out_size).to(self.device)
             self.cal_loss_func=cal_lstm_crf_loss
-        
+
         self.epoches=TrainingConfig.epoches
         self.print_step=TrainingConfig.print_step
         self.lr=TrainingConfig.lr
@@ -149,7 +149,7 @@ class BiLSTM_CRF_Model():
         #最佳损失函数,初始化一个极大值
         self._best_val_loss=1e18
         self.best_model=None
-    
+
 
     #Train 训练集
     #Dev 验证集
@@ -176,11 +176,11 @@ class BiLSTM_CRF_Model():
                     total_step=(len(train_word_lists)//self.batch_size +1)
                     print("Epoch {}, step/total_step: {}/{} Average Loss for one batch:{:.4f}".format(e,self.step,total_step,losses/self.print_step))
                     losses=0.
-            
+
             val_loss=self.validate(dev_word_lists,dev_tag_lists,word2id,tag2id)
             print("Epoch {}, Val Loss:{:.4f}".format(e,val_loss))
-       
-    
+
+
     def train_step(self,word_lists,tag_lists,word2id,tag2id):
         self.model.train()
         self.step+=1
@@ -191,17 +191,16 @@ class BiLSTM_CRF_Model():
 
         tensorized_sents=tensorized_sents.to(self.device)
         tensorized_tags=tensorized_tags.to(self.device)
-
         scores=self.model(tensorized_sents,lengths)
 
         #计算损失
         self.optimizer.zero_grad()
-        loss=self.cal_loss_func(scores,tag_lists,tag2id).to(self.device)
+        loss=self.cal_loss_func(scores,tensorized_tags,tag2id).to(self.device)
         loss.backward()
         self.optimizer.step()
 
         return loss.item()
-    
+
     #验证
     def validate(self,dev_word_lists,dev_tag_lists,word2id,tag2id):
         self.model.eval()
@@ -211,15 +210,15 @@ class BiLSTM_CRF_Model():
             val_step=0
             for ind in range(0,len(dev_word_lists),self.batch_size):
                 val_step+=1
-                batch_sents=dev_word_lists[ind,ind+self.batch_size]
-                batch_tag=dev_tag_lists[ind,ind+self.batch_size]
+                batch_sents=dev_word_lists[ind:ind+self.batch_size]
+                batch_tag=dev_tag_lists[ind:ind+self.batch_size]
                 tensorized_sent,lengths=tensorized(batch_sents,word2id)
                 tensorized_tag,lengths=tensorized(batch_tag,tag2id)
 
                 tensorized_sent=tensorized_sent.to(self.device)
                 tensorized_tag=tensorized_tag.to(self.device)
 
-                
+
                 scores=self.model(tensorized_sent,lengths)
                 loss=self.cal_loss_func(scores,tensorized_tag,tag2id).to(self.device)
 
@@ -231,9 +230,9 @@ class BiLSTM_CRF_Model():
 
                 self.best_model=deepcopy(self.model) #deepcopy 深度复制，重新建立一个对象
                 self._best_val_loss=val_loss
-            
+
             return val_loss
-    
+
 
     #测试
     def test(self,test_word_lists,test_tag_lists,word2id,tag2id):
@@ -251,7 +250,7 @@ class BiLSTM_CRF_Model():
             batch_tagids=self.best_model.test(tensorized_sent,lengths,tag2id) #[B,L]
         id2tag=dict((id,tag) for tag,id in tag2id.items())
         pred_tag_lists=[] #[B,L]
-        for i,ids in batch_tagids:
+        for i,ids in enumerate(batch_tagids):
             tag_list=[] #(L,)
             if self.crf:
                 for j in range(lengths[i]-1):
@@ -261,15 +260,15 @@ class BiLSTM_CRF_Model():
                     tag_list.append(id2tag[ids[j].item()])
 
             pred_tag_lists.append(tag_list)
-        
+
         #indices= [1,2,0] 表示 原先索引为1的 新的索引是0 [(0,1) (1,2),(2,0)] 排序后 [(2,0),(0,1),(1,2)]
         ind_maps=sorted(list(enumerate(indices)),key=lambda e:e[1])
         indices,_=list(zip(*ind_maps))
         pred_tag_lists=[pred_tag_lists[i] for i in indices]
         tag_lists=[test_tag_lists[i] for i in indices]
-        
+
         return pred_tag_lists,tag_lists
-    
+
     #评估句子
     def test_no_tag(self,word_lists,word2id,tag2id):
         indices=sorted(range(len(word_lists)),key=lambda k:len(word_lists[k]),reversed=True)
@@ -291,7 +290,7 @@ class BiLSTM_CRF_Model():
                     tag_list.append(id2tag[ids[j].item()])
             else:
                 tag_list.append(id2tag[ids[j].item()])
-        
+
         #将句子顺序还原
 
         ind_maps=sorted(list(enumerate(indices)),kkey=lambda e:e[1])
@@ -301,7 +300,7 @@ class BiLSTM_CRF_Model():
         word_lists=[word_lists[i] for i in indices]
 
         return pred_tag_lists,word_lists
-    
+
     #打印混淆矩阵
     #多分类问题
     def print_confusion_matrix(self,pred_tag_lists,tag_lists):

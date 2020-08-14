@@ -20,6 +20,8 @@ from datetime import datetime
 from evaluate import Eval_unit,evaluate_entity_label,evaluate_single_label,evaluate_multiclass,unitstopd
 from config import ModelPathConfig,ResultPathConfig
 
+import torch
+torch.cuda.set_device(1)
 cwd=os.getcwd()
 
 def sample_print_test(word_list,tag_list,sample_num=5):
@@ -151,8 +153,7 @@ def HMM_test_standard(if_train=True):
     
 
 if __name__=='__main__':
-    HMM_test(True)
-    # HMM_test_standard(False)
+    bilstm_crf_test(True)
     
 
 

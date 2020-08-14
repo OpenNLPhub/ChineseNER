@@ -44,7 +44,7 @@ def flatten_lists(lists):
     for l in lists:
         ans+=l
     return ans;
-    
+
 
 """Save and load"""
 
@@ -61,7 +61,7 @@ def load_model(file_name):
     return model
 
 
-"""   Helper Function for Model  """ 
+"""   Helper Function for Model  """
 
 def tensorized(batch,maps):
     PAD=maps.get('<pad>')
@@ -78,17 +78,17 @@ def tensorized(batch,maps):
     for i,l in enumerate(batch):
         for j,e in enumerate(l):
             batch_tensor[i][j]=maps.get(e,UNK)
-    
+
     #batch中每个item的长度
     lengths=[len(l) for l in batch]
 
     return batch_tensor,lengths
-    
+
 def sort_by_lengths(word_lists,tag_lists):
     #按照句子长度进行排序
     assert len(word_lists)==len(tag_lists)
     pairs=list(zip(word_lists,tag_lists))
-    indices=sorted(range(len(word_lists)),key=lambda k:len(pairs[k][0]),reversed=True)
+    indices=sorted(range(len(word_lists)),key=lambda k:len(pairs[k][0]),reverse=True)
 
     #pairs sorted
     pairs=[ pairs[i] for i in indices]
@@ -101,7 +101,7 @@ def cal_loss(result,targets,tag2id):
     '''
     result [B,L,out_size]
     targets:[B,L]
-    lengths:[B]    
+    lengths:[B]
     '''
     PAD= tag2id.get('<pad>')
     assert PAD is not None
