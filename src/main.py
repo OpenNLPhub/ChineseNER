@@ -34,7 +34,7 @@ def sample_print_test(word_list,tag_list,sample_num=5):
         s+='\n'
         s+=' '.join(print_tag_list[i])
         print(s)
-    
+
 
 def bilstm_crf_test(if_train=False):
     model_is_existed=os.path.exists(ModelPathConfig.bilstm_crf)
@@ -45,13 +45,13 @@ def bilstm_crf_test(if_train=False):
 
     dev_indices=random.sample(range(len(word_lists)),len(word_lists)//5)
     train_indices=[i for i in range(len(word_lists)) if i not in dev_indices]
-    
+
     dev_word_lists=[ word_lists[ind] for ind in dev_indices]
     dev_tag_lists=[tag_lists[ind] for ind in dev_indices]
     train_word_lists=[word_lists[ind] for ind in train_indices]
     train_tag_lists=[tag_lists[ind] for ind in train_indices]
     test_word_lists,test_tag_lists=add_label_for_lstmcrf(test_word_lists,test_tag_lists,test=True)
-        
+    bilstm_crf_word2id,bilstm_crf_tag2id=extend_map(word2id,tag2id,crf=True)
     if if_train or not model_is_existed:
         print('start to training')
         bilstm_crf_word2id,bilstm_crf_tag2id=extend_map(word2id,tag2id,crf=True)
@@ -76,11 +76,11 @@ def bilstm_crf_test(if_train=False):
     else:
         print("load model")
         bilstm_model=load_model(ModelPathConfig.bilstm_crf)
-      
-    
+
+
     print("test the model")
     pred_tag_lists,label_tag_lists,=bilstm_model.test(test_word_lists,test_tag_lists,bilstm_crf_word2id,bilstm_crf_tag2id)
-    
+
 
     units=evaluate_entity_label(pred_tag_lists,label_tag_lists,list(tag2id.keys()))
     df=unitstopd(units)
@@ -101,7 +101,7 @@ def HMM_test(if_train=True):
     # test_word_lists,test_tag_lists,_,_=build_corpus("test",data_dir=os.path.join(os.getcwd(),"data",'ResumeNER'))
 
     hmm_model=HMM(len(tag2id),len(word2id))
-    
+
     if if_train or not model_is_existed:
         print("start to training")
         hmm_model.train(word_lists,tag_lists,word2id,tag2id)
@@ -130,7 +130,7 @@ def HMM_test_standard(if_train=True):
     test_word_lists,test_tag_lists,_,_=build_corpus("test",data_dir=os.path.join(os.getcwd(),"data",'ResumeNER'))
 
     hmm_model=HMM_standard(len(tag2id),len(word2id))
-    
+
     if if_train or not model_is_existed:
         print("start to training")
         hmm_model.train(word_lists,tag_lists,word2id,tag2id)
@@ -139,7 +139,7 @@ def HMM_test_standard(if_train=True):
     else:
         print("load model")
         hmm_model=load_model(ModelPathConfig.hmm_standard)
-    
+
     pred_tag_lists=hmm_model.test(test_word_lists,word2id,tag2id)
     label_tag_lists=test_tag_lists
 
@@ -150,10 +150,10 @@ def HMM_test_standard(if_train=True):
     units=evaluate_single_label(pred_tag_lists,label_tag_lists,list(tag2id.keys()))
     df=unitstopd(units)
     df.to_csv(ResultPathConfig.hmm_model_standard)
-    
+
 
 if __name__=='__main__':
-    bilstm_crf_test(True)
-    
+    bilstm_crf_test(False)
+
 
 
