@@ -11,6 +11,7 @@ import random
 import pandas as pd
 import time
 import os
+from tabulate import tabulate
 from utils import extend_map,add_label_for_lstmcrf,save_model,flatten_lists,load_model
 from models.hmm import HMM
 from models.standard import HMM_standard
@@ -19,9 +20,11 @@ from data import build_corpus
 from datetime import datetime
 from evaluate import Eval_unit,evaluate_entity_label,evaluate_single_label,evaluate_multiclass,unitstopd
 from config import ModelPathConfig,ResultPathConfig
-
 import torch
-torch.cuda.set_device(1)
+
+
+if torch.cuda.is_available():
+    torch.cuda.set_device(1) 
 cwd=os.getcwd()
 
 def sample_print_test(word_list,tag_list,sample_num=5):
@@ -42,7 +45,7 @@ def bilstm_crf_test(if_train=False):
     print("upload data!")
     word_lists,tag_lists,word2id,tag2id=build_corpus("train")
     test_word_lists,test_tag_lists,_,_=build_corpus("test")
-
+    labels=list(tag2id.keys())
     dev_indices=random.sample(range(len(word_lists)),len(word_lists)//5)
     train_indices=[i for i in range(len(word_lists)) if i not in dev_indices]
 
@@ -54,8 +57,6 @@ def bilstm_crf_test(if_train=False):
     bilstm_crf_word2id,bilstm_crf_tag2id=extend_map(word2id,tag2id,crf=True)
     if if_train or not model_is_existed:
         print('start to training')
-        bilstm_crf_word2id,bilstm_crf_tag2id=extend_map(word2id,tag2id,crf=True)
-
         train_word_lists,train_tag_lists=add_label_for_lstmcrf(train_word_lists,train_tag_lists,test=False)
         dev_word_lists,dev_tag_lists=add_label_for_lstmcrf(dev_word_lists,dev_tag_lists,test=False)
 
@@ -82,13 +83,15 @@ def bilstm_crf_test(if_train=False):
     pred_tag_lists,label_tag_lists,=bilstm_model.test(test_word_lists,test_tag_lists,bilstm_crf_word2id,bilstm_crf_tag2id)
 
 
-    units=evaluate_entity_label(pred_tag_lists,label_tag_lists,list(tag2id.keys()))
+    units=evaluate_entity_label(pred_tag_lists,label_tag_lists,labels)
     df=unitstopd(units)
     df.to_csv(ResultPathConfig.bilstm_crf_entity)
+    print(tabulate(df,headers='keys',tablefmt='psql'))
 
-    units=evaluate_single_label(pred_tag_lists,label_tag_lists,list(tag2id.keys()))
+    units=evaluate_single_label(pred_tag_lists,label_tag_lists,labels)
     df=unitstopd(units)
     df.to_csv(ResultPathConfig.bilstm_crf_model)
+    print(tabulate(df,headers='keys',tablefmt='psql'))
 
 
 def HMM_test(if_train=True):
@@ -116,10 +119,12 @@ def HMM_test(if_train=True):
     units=evaluate_entity_label(pred_tag_lists,label_tag_lists,list(tag2id.keys()))
     df=unitstopd(units)
     df.to_csv(ResultPathConfig.hmm_entity)
+    print(tabulate(df,headers='keys',tablefmt='psql'))
 
     units=evaluate_single_label(pred_tag_lists,label_tag_lists,list(tag2id.keys()))
     df=unitstopd(units)
     df.to_csv(ResultPathConfig.hmm_model)
+    print(tabulate(df,headers='keys',tablefmt='psql'))
 
 
 def HMM_test_standard(if_train=True):
@@ -146,10 +151,12 @@ def HMM_test_standard(if_train=True):
     units=evaluate_entity_label(pred_tag_lists,label_tag_lists,list(tag2id.keys()))
     df=unitstopd(units)
     df.to_csv(ResultPathConfig.hmm_entity_standard)
+    print(tabulate(df,headers='keys',tablefmt='psql'))
 
     units=evaluate_single_label(pred_tag_lists,label_tag_lists,list(tag2id.keys()))
     df=unitstopd(units)
     df.to_csv(ResultPathConfig.hmm_model_standard)
+    print(tabulate(df,headers='keys',tablefmt='psql'))
 
 
 if __name__=='__main__':
