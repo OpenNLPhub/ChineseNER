@@ -10,6 +10,7 @@ from utils import extend_map_bert,save_model,load_model
 from evaluate import evaluate_entity_label,evaluate_multiclass,evaluate_single_label,unitstopd
 from tabulate import tabulate
 import pandas as pd
+
 def bert_test():
     model_is_exitsed=os.path.exists(ModelPathConfig.bert)
 
@@ -69,7 +70,6 @@ def bert_test():
     df=unitstopd(units)
     df.to_csv(ResultPathConfig.bert_model)
     print(tabulate(df,headers='keys',tablefmt='psql'))
-
 
 
 
