@@ -78,6 +78,7 @@ class HMM_standard(object):
             pred_tag_lists.append(pred_tag_list)
         return pred_tag_lists
 
+
     def decoding(self, word_list, word2id, tag2id):
         """
         使用维特比算法对给定观测序列求状态序列， 这里就是对字组成的序列,求其对应的标注。

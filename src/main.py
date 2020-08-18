@@ -22,6 +22,8 @@ from evaluate import Eval_unit,evaluate_entity_label,evaluate_single_label,evalu
 from config import ModelPathConfig,ResultPathConfig
 import torch
 
+from evaluating import bert_test
+
 
 if torch.cuda.is_available():
     torch.cuda.set_device(1) 
@@ -160,7 +162,7 @@ def HMM_test_standard(if_train=True):
 
 
 if __name__=='__main__':
-    bilstm_crf_test(False)
+    bert_test()
 
 
 

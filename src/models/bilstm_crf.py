@@ -299,7 +299,7 @@ class BiLSTM_CRF_Model():
         pred_tag_lists=[pred_tag_lists[i] for i in indices]
         word_lists=[word_lists[i] for i in indices]
 
-        return pred_tag_lists,word_lists
+        return pred_tag_lists
 
     #打印混淆矩阵
     #多分类问题

@@ -31,6 +31,8 @@ class ModelPathConfig(object):
     bilstm=os.path.join(root,'bilstm')
     hmm=os.path.join(root,'hmm')
     hmm_standard=os.path.join(root,'hmm_standard')
+    bert=os.path.join(root,'bert')
+
 
 class ResultPathConfig(object):
     root=os.path.join(cwd,'data','result')
@@ -43,3 +45,6 @@ class ResultPathConfig(object):
 
     hmm_model_standard=os.path.join(root,'hmm_model_standard_result.csv')
     hmm_entity_standard=os.path.join(root,'hmm_entity_standard_result.csv')
+
+    bert_model=os.path.join(root,'bert_model_result.csv')
+    bert_entity=os.path.join(root,'bert_entity_result.csv')

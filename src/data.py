@@ -7,6 +7,7 @@
 
 import os
 from codecs import open
+from torch.utils.data import Dataset
 
 def build_corpus(prefix_file,data_dir=os.path.join(os.getcwd(),"data")):
     assert prefix_file in ['train','dev','test']
@@ -45,3 +46,16 @@ def build_map(lists):
             if word not in maps:
                 maps[word]=len(maps)
     return maps
+
+
+
+class NERDataSet(Dataset):
+
+    def __init__(self,prefix_file):
+        self.word_lists,self.tag_lists=build_corpus(prefix_file)
+
+    def __len__(self):
+        return len(self.word_lists)
+    
+    def __getitem__(self,idx):
+        return {'word_list':self.word_lists[idx],'tag_list':self.tag_lists[idx]}

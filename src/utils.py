@@ -10,6 +10,7 @@ import torch.autograd as autograd
 import torch.nn as nn
 import torch.nn.functional as F
 import pickle
+import numpy as np
 
 """ Preprocessing Function """
 
@@ -42,7 +43,10 @@ def add_label_for_lstmcrf(word_lists,tag_lists,test=False):
 def flatten_lists(lists):
     ans=[]
     for l in lists:
-        ans+=l
+        if type(l)==list:
+            ans+=l
+        else:
+            ans.append(l)
     return ans;
 
 
@@ -61,7 +65,7 @@ def load_model(file_name):
     return model
 
 
-"""   Helper Function for Model  """
+"""   Helper Function for LSTM_CRF Model  """
 
 def tensorized(batch,maps):
     PAD=maps.get('<pad>')
@@ -194,6 +198,35 @@ def indexed(targets, tagset_size, start_id):
         targets[:, col] += (targets[:, col-1] * tagset_size)
     targets[:, 0] += (start_id * tagset_size)
     return targets
+
+
+
+''' Helper Function for Bert '''
+
+#sentence 用Tokenizer ， tag 需要自己增加padding
+def tag_add_padding(batch,max_len,tag2id):
+    PAD=tag2id.get('[PAD]')
+    CLS=tag2id.get('[CLS]')
+    SEP=tag2id.get('[SEP]')
+    
+    batch_size=len(batch)
+
+    batch_tensor=np.ones(batch_size,max_len)* PAD
+
+    for i,l in enumerate(batch):
+        batch_tensor[i][0]=CLS
+        for j,e in enumerate(l):
+            batch_tensor[i][j+1]=tag2id.get(e)
+        batch[i][j+1]=SEP
+    
+    return batch_tensor
+
+def extend_map_bert(tag2id):
+    tag2id['[UNK}']=len(tag2id)
+    tag2id['[PAD]']=len(tag2id)
+    tag2id['[CLS]']=len(tag2id)
+    tag2id['[SEP]']=len(tag2id)
+    return tag2id
 
 if __name__=='__main__':
     pass
