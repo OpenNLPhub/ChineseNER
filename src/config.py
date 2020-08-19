@@ -21,8 +21,8 @@ class TrainingConfig(object):
     #batch
     batch_size=64
     lr=0.001
-    epoches=30
-    print_step=5
+    epoches=20
+    print_step=15
 
 
 class ModelPathConfig(object):

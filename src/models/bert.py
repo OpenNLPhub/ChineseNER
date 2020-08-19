@@ -175,8 +175,8 @@ class BERT_Model(object):
         max_len=len(test_sentence_list[0])
         tensor_labels=torch.from_numpy(tag_add_padding(test_tag_lists,max_len,tag2id)).long().to(self.device)
 
-        mask=(tensor_labels!=tag2id.get('[CLS]')) and (tensor_labels!=tag2id.get('[SEP]')) \
-            and (tensor_labels!=tag2id.get('[PAD]'))
+        mask=(tensor_labels!=tag2id.get('[CLS]')) & (tensor_labels!=tag2id.get('[SEP]')) \
+            & (tensor_labels!=tag2id.get('[PAD]'))
 
         self.best_model.eval()
 
