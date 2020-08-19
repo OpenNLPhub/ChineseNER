@@ -159,7 +159,7 @@ class BERT_Model(object):
                 print("Upgrade Model and save Model")
                 self.best_model=deepcopy(self.model) #deepcopy 深度复制，重新建立一个对象
                 self._best_val_loss=val_loss
-            return val_losses
+            return val_loss
 
     
     def test(self,test_word_lists,test_tag_lists,word2id,tag2id):
