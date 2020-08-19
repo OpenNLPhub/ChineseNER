@@ -122,8 +122,8 @@ class BERT_Model(object):
         batch_tensor_attention_mask=torch.from_numpy(np.array(batch_attention_mask)).float().to(self.device)
         batch_tensor_labels=torch.from_numpy(batch_tag).long().to(self.device)
 
-        print(batch_tensor_input_ids.shape)
-        print(batch_tensor_labels.shape)
+        # print(batch_tensor_input_ids.shape)
+        # print(batch_tensor_labels.shape)
         loss=self.model(input_ids=batch_tensor_input_ids,attention_mask=batch_tensor_attention_mask,\
             labels=batch_tensor_labels)
         
@@ -197,7 +197,7 @@ class BERT_Model(object):
                 batch_out=torch.argmax(batch_outputs,dim=2)
                 batch_pred_tag2id=batch_out.masked_select(batch_mask)
                 pred_tagid+=batch_pred_tag2id
-                
+
         #将tagid 解码成tag
         id2tag=dict((value,key) for key,value in tag2id.items())
         pred_tag=[id2tag.get(i.item()) for i in pred_tagid]
