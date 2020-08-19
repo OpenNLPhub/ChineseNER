@@ -208,7 +208,7 @@ def tag_add_padding(batch,max_len,tag2id):
     PAD=tag2id.get('[PAD]')
     CLS=tag2id.get('[CLS]')
     SEP=tag2id.get('[SEP]')
-    
+    UNK=tag2id.get('[UNK]')
     batch_size=len(batch)
 
     batch_tensor=np.ones((batch_size,max_len))* PAD
@@ -216,13 +216,13 @@ def tag_add_padding(batch,max_len,tag2id):
     for i,l in enumerate(batch):
         batch_tensor[i][0]=CLS
         for j,e in enumerate(l):
-            batch_tensor[i][j+1]=tag2id.get(e)
-        batch_tensor[i][j+1]=SEP
+            batch_tensor[i][j+1]=tag2id.get(e,UNK)
+        batch_tensor[i][len(l)+1]=SEP
     
     return batch_tensor
 
 def extend_map_bert(tag2id):
-    tag2id['[UNK}']=len(tag2id)
+    tag2id['[UNK]']=len(tag2id)
     tag2id['[PAD]']=len(tag2id)
     tag2id['[CLS]']=len(tag2id)
     tag2id['[SEP]']=len(tag2id)

@@ -169,23 +169,35 @@ class BERT_Model(object):
         test_sentence_list=inputs['input_ids']
         test_sentence_attention_mask=inputs['attention_mask']
 
-        tensor_inputs_ids=torch.from_numpy(np.array(test_sentence_list)).long().to(self.device)
-        tensor_attention_mask=torch.from_numpy(np.array(test_sentence_attention_mask)).float().to(self.device)
+        tensor_inputs_ids=torch.from_numpy(np.array(test_sentence_list)).long()
+        tensor_attention_mask=torch.from_numpy(np.array(test_sentence_attention_mask)).float()
         
         max_len=len(test_sentence_list[0])
-        tensor_labels=torch.from_numpy(tag_add_padding(test_tag_lists,max_len,tag2id)).long().to(self.device)
+        tensor_labels=torch.from_numpy(tag_add_padding(test_tag_lists,max_len,tag2id)).long()
 
-        mask=(tensor_labels!=tag2id.get('[CLS]')) & (tensor_labels!=tag2id.get('[SEP]')) \
-            & (tensor_labels!=tag2id.get('[PAD]'))
+        # mask=(tensor_labels!=tag2id.get('[CLS]')) & (tensor_labels!=tag2id.get('[SEP]')) \
+        #     & (tensor_labels!=tag2id.get('[PAD]'))
 
         self.best_model.eval()
-
+        pred_tagid=[]
         with torch.no_grad():
-            outputs=self.best_model.test(tensor_inputs_ids,tensor_attention_mask)
-            #outputs [Batch_size, sentence_len,label_num]
-            out=torch.argmax(outputs,dim=2) #[Batch_size,sentence_len]
-            pred_tagid=out.masked_select(mask)
+            B=self.batch_size
+            for ind in range(0,len(test_word_lists),B):
+                batch_tensor_inputs_ids=tensor_inputs_ids[ind:ind+B].to(self.device)
+                batch_tensor_attention_mask=tensor_attention_mask[ind:ind+B].to(self.device)
+                batch_tensor_labels=tensor_labels[ind:ind+B].to(self.device)
 
+                batch_mask=(batch_tensor_labels!=tag2id.get('[CLS]')) &\
+                        (batch_tensor_labels!=tag2id.get('[PAD]')) &\
+                        (batch_tensor_labels!=tag2id.get('[SEP]'))
+                
+                batch_outputs=self.best_model.test(input_ids=batch_tensor_inputs_ids,\
+                    attention_mask=batch_tensor_attention_mask)
+                
+                batch_out=torch.argmax(batch_outputs,dim=2)
+                batch_pred_tag2id=batch_out.masked_select(batch_mask)
+                pred_tagid+=batch_pred_tag2id
+                
         #将tagid 解码成tag
         id2tag=dict((value,key) for key,value in tag2id.items())
         pred_tag=[id2tag.get(i.item()) for i in pred_tagid]
