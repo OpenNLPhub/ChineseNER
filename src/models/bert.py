@@ -30,13 +30,13 @@ class bert_chinese_ner(nn.Module):
         input_ids:输入数据 [Batch_size,max_length]
         token_type_ids:该参数是当输入一个（sentence,sentence） tuple时标定word属于哪个句子，只能取1，0。这里可以不用
         attention_mask:Mask to avoid performing attention on padding token indices. Mask Value selected in [0,1] [Batch_size,max_length]
-        labels:单词的tag,[Batch_size,sequence_length]
+        labels:单词的tag,[Batch_size,max_length]
         '''
-        return self.model(input_ids,attention_mask,labels) # [] 
+        return self.model(input_ids=input_ids,attention_mask=attention_mask,labels=labels)[0] # [] 0 是Loss 
 
     def test(self,input_ids,attention_mask):
         #score [batch_size,sentence_len,label_size] before Softmax
-        return self.model(input_ids,attention_mask)[0]
+        return self.model(input_ids=input_ids,attention_mask=attention_mask)[0]
 
 
 class BERT_Model(object):
@@ -53,7 +53,8 @@ class BERT_Model(object):
         self.hidden_size=0
         #因为使用Bert 预训练模型，因此该项没有作用, vocab_size defaults to 30522  hidden_size,embedding_size defaults yo 768
         self.out_size=out_size
-        self.model=bert_chinese_ner(self.vocab_size,self.emb_size,self.hidden_size,self.out_size);
+
+        self.model=bert_chinese_ner(self.vocab_size,self.emb_size,self.hidden_size,self.out_size).to(self.device);
         self.tokenizer=bert_chinese_ner.getTokenizer()
 
         self.epoches=TrainingConfig.epoches
@@ -121,6 +122,8 @@ class BERT_Model(object):
         batch_tensor_attention_mask=torch.from_numpy(np.array(batch_attention_mask)).float().to(self.device)
         batch_tensor_labels=torch.from_numpy(batch_tag).long().to(self.device)
 
+        print(batch_tensor_input_ids.shape)
+        print(batch_tensor_labels.shape)
         loss=self.model(input_ids=batch_tensor_input_ids,attention_mask=batch_tensor_attention_mask,\
             labels=batch_tensor_labels)
         
@@ -156,7 +159,7 @@ class BERT_Model(object):
                 print("Upgrade Model and save Model")
                 self.best_model=deepcopy(self.model) #deepcopy 深度复制，重新建立一个对象
                 self._best_val_loss=val_loss
-            return val_losses()
+            return val_losses
 
     
     def test(self,test_word_lists,test_tag_lists,word2id,tag2id):

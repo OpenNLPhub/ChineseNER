@@ -211,13 +211,13 @@ def tag_add_padding(batch,max_len,tag2id):
     
     batch_size=len(batch)
 
-    batch_tensor=np.ones(batch_size,max_len)* PAD
+    batch_tensor=np.ones((batch_size,max_len))* PAD
 
     for i,l in enumerate(batch):
         batch_tensor[i][0]=CLS
         for j,e in enumerate(l):
             batch_tensor[i][j+1]=tag2id.get(e)
-        batch[i][j+1]=SEP
+        batch_tensor[i][j+1]=SEP
     
     return batch_tensor
 

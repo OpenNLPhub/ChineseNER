@@ -30,12 +30,12 @@ def bert_test():
     train_tag_lists=[tag_lists[ind] for ind in train_indices]
 
     bert_tag2id=extend_map_bert(tag2id)
-
+    
     if not model_is_exitsed:
         print('start to training')
         start=datetime.now()
         vocab_size=len(word2id)
-        out_size=len(tag2id)
+        out_size=len(bert_tag2id)
         bert_model=BERT_Model(vocab_size,out_size)
         bert_model.train(train_word_lists,train_tag_lists,\
             word2id,bert_tag2id,dev_word_lists,dev_tag_lists)
