@@ -26,7 +26,8 @@ from evaluating import bert_test
 
 
 if torch.cuda.is_available():
-    torch.cuda.set_device(1) 
+    torch.cuda.set_device(1)
+     
 cwd=os.getcwd()
 
 def sample_print_test(word_list,tag_list,sample_num=5):
@@ -57,6 +58,7 @@ def bilstm_crf_test(if_train=False):
     train_tag_lists=[tag_lists[ind] for ind in train_indices]
     test_word_lists,test_tag_lists=add_label_for_lstmcrf(test_word_lists,test_tag_lists,test=True)
     bilstm_crf_word2id,bilstm_crf_tag2id=extend_map(word2id,tag2id,crf=True)
+    
     if if_train or not model_is_existed:
         print('start to training')
         train_word_lists,train_tag_lists=add_label_for_lstmcrf(train_word_lists,train_tag_lists,test=False)
@@ -65,8 +67,8 @@ def bilstm_crf_test(if_train=False):
         # sample_print_test(train_word_lists,train_tag_lists)
 
         start=datetime.now()
-        vocab_size=len(word2id)
-        out_size=len(tag2id)
+        vocab_size=len(bilstm_crf_word2id)
+        out_size=len(bilstm_crf_tag2id)
 
         bilstm_model=BiLSTM_CRF_Model(vocab_size,out_size,crf=True)
         bilstm_model.train(train_word_lists,train_tag_lists,\
@@ -162,7 +164,7 @@ def HMM_test_standard(if_train=True):
 
 
 if __name__=='__main__':
-    bert_test()
+    bilstm_crf_test(if_train=True)
 
 
 
