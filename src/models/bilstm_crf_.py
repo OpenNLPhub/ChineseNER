@@ -120,7 +120,7 @@ class BiLSTM_CRF_Model(object):
                 scores=self.model(tensorized_sent,lengths)
                 loss=self.model.loss_cal(scores,lengths,tensorized_tag)
                 val_losses+=loss.item()
-            val_loss=val_losses/val_step/self.batch_size  #每个Batch随机损失值
+            val_loss=val_losses/val_step  #每个batch随机损失值
 
             if val_loss<self._best_val_loss:
                 print("Upgrade Model and save Model")
