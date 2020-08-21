@@ -2,7 +2,7 @@ import torch
 import torch.nn as nn
 from torch.autograd import Variable
 import numpy as np
-class crf(nn.Module):
+class CRF(nn.Module):
     '''条件随机场
        因为在组合模型中一次又一次 重写CRF代码，于是用重写这个类，将模块抽离出来
        tag_nums: label nums，对应转移矩阵的大小
@@ -10,8 +10,8 @@ class crf(nn.Module):
                   True 输入的tag_num里面已经含有了标签
         start_tag,end_tag 若is_padding 为Ture,start_tag和end_tag为在tag_nums中的索引
     '''
-    def __init__(self,tag_nums,is_padding=True,start_tag=None,end_tag=None):
-        super(crf,self).__init__()
+    def __init__(self,tag_nums,is_padding=False,start_tag=None,end_tag=None):
+        super(CRF,self).__init__()
         self.tag_nums=tag_nums
         if is_padding:
             self.start_tag=start_tag
@@ -22,7 +22,7 @@ class crf(nn.Module):
             self.end_tag=self.tag_nums+1
             self.trans_size=self.tag_nums+2
         
-        self.device= "cuda" if torch.cuda.is_available else "cpu"
+        self.device= "cuda" if torch.cuda.is_available() else "cpu"
         self.transitions=nn.Parameter(torch.from_numpy(np.random.randn(self.trans_size,self.trans_size))).to(self.device)
         #self.transitions[i][j] 表示从隐藏状态i转换到隐藏状态j的概率
         self.transitions[:,self.start_tag]=-1000 #从其他状态到START状态，为不可能事件
@@ -41,7 +41,7 @@ class crf(nn.Module):
        log sum(exp(S1)+exp(S2)+exp(S3)+...+exp(Sn))通过 _get_all_possible_path_score 获得 
     '''
     def loss_cal(self,features,length,tags):
-        batch_size,_,num_tag=features.shape[0]
+        batch_size,_,num_tag=features.shape
         loss=torch.zeros(1,requires_grad=True).squeeze(0)
 
         #feature [padding_length,num_tag]
@@ -59,8 +59,8 @@ class crf(nn.Module):
             cost=total_score-real_score
 
             loss+=cost
-
-        return loss
+    
+        return loss/batch_size
 
     '''计算真实路径得分
         feature [length_sent,num_tag]
@@ -68,14 +68,14 @@ class crf(nn.Module):
     '''
     def _get_real_path_score(self,feature,tagid):
         # [start_tag_id, tag1id,tag2id,...]
-        tag_padding_start=torch.cat([torch.from_numpy(np.array([self.start_tag])),tagid])
+        tag_padding_start=torch.cat([torch.from_numpy(np.array([self.start_tag])).to(self.device),tagid])
         # [tag1id,tag2id,...,tagnid,end_tag_id]
-        tag_padding_end=torch.cat([tagid,torch.from_numpy(np.array([self.end_tag]))])
+        tag_padding_end=torch.cat([tagid,torch.from_numpy(np.array([self.end_tag])).to(self.device)])
 
         trans_score=self.transitions[tag_padding_start,tag_padding_end]
         trans_score=torch.sum(trans_score)
 
-        order=torch.LongTensor(range(feature.size(0)))
+        order=torch.LongTensor(range(feature.size(0))).to(self.device)
 
         emission_score=torch.sum(feature[order,tagid])
 

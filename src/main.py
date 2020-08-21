@@ -22,7 +22,7 @@ from evaluate import Eval_unit,evaluate_entity_label,evaluate_single_label,evalu
 from config import ModelPathConfig,ResultPathConfig
 import torch
 
-from evaluating import bert_test
+from evaluating import bert_test,_bilstm_crf_test
 
 
 if torch.cuda.is_available():
@@ -68,7 +68,7 @@ def bilstm_crf_test(if_train=False):
 
         start=datetime.now()
         vocab_size=len(bilstm_crf_word2id)
-        out_size=len(bilstm_crf_tag2id)
+        out_size=len(tag2id)
 
         bilstm_model=BiLSTM_CRF_Model(vocab_size,out_size,crf=True)
         bilstm_model.train(train_word_lists,train_tag_lists,\
@@ -165,6 +165,7 @@ def HMM_test_standard(if_train=True):
 
 if __name__=='__main__':
     bilstm_crf_test(if_train=True)
+    _bilstm_crf_test(if_train=True)
 
 
 

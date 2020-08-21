@@ -32,6 +32,7 @@ class ModelPathConfig(object):
     hmm=os.path.join(root,'hmm')
     hmm_standard=os.path.join(root,'hmm_standard')
     bert=os.path.join(root,'bert')
+    _bilstm_crf=os.path.join(root,'_bilstm_crf')
 
 
 class ResultPathConfig(object):
@@ -48,3 +49,13 @@ class ResultPathConfig(object):
 
     bert_model=os.path.join(root,'bert_model_result.csv')
     bert_entity=os.path.join(root,'bert_entity_result.csv')
+
+    _bilstm_crf_model=os.path.join(root,'_bilstm_crf_model_result.csv')
+    _bilstm_crf_entity=os.path.join(root,'_bilstm_crf_entity_result.csv')
+
+
+class BiLSTM_CRF_TrainingConfig(object):
+    batch_size=64
+    lr=0.001
+    epoches=20
+    print_step=15
