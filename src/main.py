@@ -165,7 +165,7 @@ def HMM_test_standard(if_train=True):
 
 if __name__=='__main__':
     bilstm_crf_test(if_train=True)
-    _bilstm_crf_test(if_train=True)
+    # _bilstm_crf_test(if_train=True)
 
 
 

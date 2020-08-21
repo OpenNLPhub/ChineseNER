@@ -27,18 +27,18 @@ class TrainingConfig(object):
 
 class ModelPathConfig(object):
     root=os.path.join(cwd,'data','model')
-    bilstm_crf=os.path.join(root,'bilstm_crf')
+    bilstm_crf=os.path.join(root,'bilstmcrf')
     bilstm=os.path.join(root,'bilstm')
     hmm=os.path.join(root,'hmm')
     hmm_standard=os.path.join(root,'hmm_standard')
     bert=os.path.join(root,'bert')
-    _bilstm_crf=os.path.join(root,'_bilstm_crf')
+    _bilstm_crf=os.path.join(root,'bilstm_crf')
 
 
 class ResultPathConfig(object):
     root=os.path.join(cwd,'data','result')
-    bilstm_crf_model=os.path.join(root,'bilstm_crf_model_result.csv')
-    bilstm_crf_entity=os.path.join(root,'bilstm_crf_entity_result.csv')
+    bilstm_crf_model=os.path.join(root,'bilstmcrf_model_result.csv')
+    bilstm_crf_entity=os.path.join(root,'bilstmcrf_entity_result.csv')
 
     hmm_model=os.path.join(root,'hmm_model_result.csv')
     hmm_entity=os.path.join(root,'hmm_entity_result.csv')
@@ -50,8 +50,8 @@ class ResultPathConfig(object):
     bert_model=os.path.join(root,'bert_model_result.csv')
     bert_entity=os.path.join(root,'bert_entity_result.csv')
 
-    _bilstm_crf_model=os.path.join(root,'_bilstm_crf_model_result.csv')
-    _bilstm_crf_entity=os.path.join(root,'_bilstm_crf_entity_result.csv')
+    _bilstm_crf_model=os.path.join(root,'bilstm_crf_model_result.csv')
+    _bilstm_crf_entity=os.path.join(root,'bilstm_crf_entity_result.csv')
 
 
 class BiLSTM_CRF_TrainingConfig(object):
