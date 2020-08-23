@@ -90,9 +90,46 @@ class example_nn(nn.Module):
 
 
 
-src.models.wrapper
+**src.models.wrapper**
+
+In this package, we wrapper models and packed them in classes which have same implementation. For every model, the wrapper class is inherited from a ModelWrapper class. In specific model class, we can also overwrite some method, like test,validate,train, which are unified implementation.
+
+In addition, we try to write some sub model to assemble the ModelWrapper class. Like test,validate,train.
+
+User can only call this class instead of classes under nn directory.
+
+```python
+class ModelWrapper(object):
+  def __init__(self):
+    pass
+  def test(self):
+    '''
+    
+    '''
+    pass
+ 	def train(self):
+    '''
+    
+    '''
+    pass
+  def validate(self):
+    '''
+    
+    '''
+    pass
+  def train_step(self):
+    '''
+    '''
+    pass
 
 
+class  LSTM_CRF_Model(ModelWrapper):
+  def __init__(self):
+    pass
+  @Overwrite()
+  def train(self):
+    pass
+```
 
 
 
