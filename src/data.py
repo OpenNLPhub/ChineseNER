@@ -49,6 +49,7 @@ def build_map(lists):
 
 
 
+
 class NERDataSet(Dataset):
 
     def __init__(self,prefix_file):
@@ -59,3 +60,4 @@ class NERDataSet(Dataset):
     
     def __getitem__(self,idx):
         return {'word_list':self.word_lists[idx],'tag_list':self.tag_lists[idx]}
+

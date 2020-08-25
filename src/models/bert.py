@@ -14,6 +14,7 @@ from utils import tag_add_padding
 from copy import deepcopy
 progress=ProgressBar()
 
+
 class bert_chinese_ner(nn.Module):
     model_path=os.path.join(cwd,'data','static','bert-base-chinese')
     def __init__(self,vocab_size,emb_size,hidden_size,num_labels):
@@ -38,7 +39,10 @@ class bert_chinese_ner(nn.Module):
         #score [batch_size,sentence_len,label_size] before Softmax
         return self.model(input_ids=input_ids,attention_mask=attention_mask)[0]
 
-
+# class bert(nn.Module):
+#     model_path=os.path.join(cwd,'data','static','bert-base-chinese')
+#     def __init__(self,vocab_size,emb_size,hidden_size,num_labels):
+        
 class BERT_Model(object):
     def __init__(self,vocab_size,out_size):
         """初始化参数：

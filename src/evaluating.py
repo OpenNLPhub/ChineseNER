@@ -126,5 +126,9 @@ def _bilstm_crf_test(if_train=True):
     print(tabulate(df,headers='keys',tablefmt='psql'))
 
 
+def mrc_bert_test(if_train=True):
+    pass
+
+
 if __name__=='__main__':
     pass
